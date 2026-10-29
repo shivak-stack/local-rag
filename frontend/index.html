@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Local RAG</title>
+
+    <link rel="stylesheet" href="/static/css/styles.css?v=workspace-ui-20260930-3">
+
+</head>
+
+<body>
+
+    <div id="toast" role="status" aria-live="polite"></div>
+
+    <div id="app">
+        <header class="topbar">
+            <div class="brand-block">
+                <div class="brand-mark" aria-hidden="true">LR</div>
+                <div>
+                    <div class="brand-name">LOCAL <span>RAG</span></div>
+                    <div class="brand-caption">HEALTHCARE DOCUMENT INTELLIGENCE</div>
+                </div>
+                <span class="system-pill"><i></i> LOCAL PIPELINE</span>
+            </div>
+            <div class="topbar-actions">
+                <button id="exportBtn" class="toolbar-btn" aria-expanded="false" aria-controls="exportMenu">
+                    <span aria-hidden="true">&#x21E9;</span> Export
+                </button>
+                <div id="exportMenu" class="export-menu" hidden>
+                    <button type="button" data-export-format="txt">Export TXT</button>
+                    <button type="button" data-export-format="md">Export Markdown</button>
+                    <button type="button" data-export-format="pdf">Export PDF</button>
+                </div>
+                <button id="settingsBtn" class="toolbar-btn settings-action">
+                    <span aria-hidden="true">&#x2699;</span> Settings
+                </button>
+            </div>
+        </header>
+
+        <div class="app-shell">
+            <aside class="sidebar">
+                <div class="sidebar-heading">
+                    <div>
+                        <span class="eyebrow">WORKSPACE</span>
+                        <h2>Document corpus</h2>
+                    </div>
+                </div>
+
+                <button id="uploadBtn" class="nav-btn upload-action">
+                    <span class="button-icon" aria-hidden="true">&#xFF0B;</span> Add document
+                </button>
+                <button id="documentsBtn" class="nav-btn documents-action" aria-expanded="false" aria-controls="documentsPanel">
+                    <span class="button-icon" aria-hidden="true">&#x25A4;</span> Documents
+                    <span class="toggle-caret" aria-hidden="true">&#x2304;</span>
+                </button>
+
+                <div class="corpus-label"><span>INDEXED DOCUMENTS</span></div>
+                <div id="documentsPanel" class="documents-panel" hidden>
+                    <p class="empty-corpus">Your healthcare documents will appear here.</p>
+                </div>
+
+                <div class="sidebar-footer">
+                    <span class="status-led"></span>
+                    <span>Local processing active</span>
+                </div>
+            </aside>
+
+            <main id="mainContent">
+
+            <!-- INITIAL SCREEN -->
+
+            <section id="uploadScreen">
+
+                <div class="landing-copy">
+                    <span class="eyebrow">PRIVATE &middot; GROUNDED &middot; LOCAL</span>
+                    <h1>Healthcare knowledge,<br><span>within reach.</span></h1>
+                    <p>Upload a healthcare document to build a focused, source-grounded workspace.</p>
+                </div>
+
+                <div id="dropZone">
+
+                    <input
+                        type="file"
+                        id="fileInput"
+                        accept=".pdf,.docx,.xlsx,.csv,.txt,.zip"
+                        hidden
+                    >
+
+                    <div class="upload-glyph" aria-hidden="true">&#x2191;</div>
+                    <p class="drop-title">Drop a document to begin</p>
+
+                    <p class="upload-formats">
+                        PDF, Word (.docx), Excel (.xlsx), CSV, TXT, or Kaggle ZIP archives
+                    </p>
+
+                    <p id="uploadStatus" role="status" aria-live="polite" hidden></p>
+
+                    <button id="browseBtn" class="primary-btn">
+                        Browse files <span aria-hidden="true">&#x2197;</span>
+                    </button>
+
+                </div>
+
+            </section>
+
+            <!-- ACTIVE SCREEN -->
+
+            <section id="workspace" hidden>
+
+                <!-- PDF VIEWER -->
+
+                <div id="viewerPanel">
+
+                    <div class="panel-header viewer-header">
+                        <div class="panel-title-group">
+                            <span class="panel-icon" aria-hidden="true">&#x2317;</span>
+                            <div><span class="eyebrow">SOURCE</span><h2>Document viewer</h2></div>
+                        </div>
+                        <span id="activeDocumentName" class="active-document-name">No document selected</span>
+                    </div>
+
+                    <div id="documentViewer">
+
+                        <div id="pdfContainer">
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <!-- RESIZABLE SPLITTER -->
+
+                <div id="splitter"></div>
+
+                <!-- CHAT -->
+
+                <div id="chatPanel">
+
+                    <div class="panel-header chat-header">
+                        <div class="panel-title-group">
+                            <span class="panel-icon" aria-hidden="true">&#x25C9;</span>
+                            <div><span class="eyebrow">ASSISTANT</span><h2>Grounded chat</h2></div>
+                        </div>
+                        <span class="grounding-badge"><i></i> GROUNDED</span>
+                    </div>
+
+                    <div id="chatMessages"></div>
+
+                    <div id="followups"></div>
+
+                    <div id="chatInputArea">
+
+                        <input
+                            id="questionInput"
+                            placeholder="Ask about the document..."
+                        >
+
+                        <button id="sendBtn" class="send-btn" aria-label="Send message">
+                            <span aria-hidden="true">&#x2191;</span>
+                        </button>
+
+                    </div>
+
+                    <div id="analyticsBar">
+
+                        <span id="contextLength">
+                            Context: 0
+                        </span>
+
+                        <span id="retrievedChunks">
+                            Chunks: 0
+                        </span>
+
+                        <span id="responseTime">
+                            Time: 0s
+                        </span>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+            </main>
+        </div>
+
+    </div>
+
+    <!-- SETTINGS DRAWER -->
+
+    <div id="settingsDrawer" aria-label="Settings">
+
+        <div class="drawer-heading">
+            <h3>Settings</h3>
+            <button id="settingsCloseBtn" type="button" aria-label="Close settings" title="Close settings">&#x00D7;</button>
+        </div>
+
+        <label>
+            Search Mode
+        </label>
+
+        <select id="searchMode">
+
+            <option value="hybrid">
+                Hybrid
+            </option>
+
+            <option value="semantic">
+                Semantic
+            </option>
+
+            <option value="bm25">
+                Keyword (BM25)
+            </option>
+
+        </select>
+
+        <label for="topK">Top K</label>
+        <input type="number" id="topK" min="1" max="20" step="1" value="5">
+        <label for="modelSelection">Model</label>
+        <select id="modelSelection">
+            <option value="qwen3:8b">qwen3:8b</option>
+            <option value="qwen3:14b">qwen3:14b</option>
+            <option value="llama3.1:8b">llama3.1:8b</option>
+            <option value="mistral">mistral</option>
+        </select>
+    </div>
+
+    <!-- PDF.js -->
+
+    <!-- APP SCRIPTS -->
+
+    <script src="/static/js/api.js?v=workspace-ui-20260930-2"></script>
+    <script src="/static/js/storage.js?v=workspace-ui-20260930-2"></script>
+    <script src="/static/js/upload.js?v=workspace-ui-20260930-2"></script>
+    <script src="/static/js/chat.js?v=workspace-ui-20260930-2"></script>
+
+    <script src="/static/vendor/pdf.min.js"></script>
+
+    <script src="/static/js/viewer.js?v=workspace-ui-20260930-2"></script>
+    <script src="/static/js/splitter.js?v=workspace-ui-20260930-2"></script>
+    <script src="/static/js/documents.js?v=workspace-ui-20260930-2"></script>
+    <script src="/static/js/app.js?v=workspace-ui-20260930-2"></script>
+    <script src="/static/js/settings.js?v=workspace-ui-20260930-2"></script>
+
+</body>
+
+</html>
